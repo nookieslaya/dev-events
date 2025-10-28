@@ -24,8 +24,6 @@ const CreateEventForm: React.FC = () => {
   const [tags, setTags] = useState("");
   const [agendaText, setAgendaText] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  // Honeypot field (should stay empty)
-  const [company, setCompany] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,16 +34,6 @@ const CreateEventForm: React.FC = () => {
 
     if (!imageFile) {
       setError("Please select an image file.");
-      return;
-    }
-    // Client-side image validation (mirror server rules)
-    if (!imageFile.type.startsWith('image/')) {
-      setError('Please upload a valid image file.');
-      return;
-    }
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (imageFile.size > maxSize) {
-      setError('Image too large. Max 5MB.');
       return;
     }
 
@@ -76,9 +64,6 @@ const CreateEventForm: React.FC = () => {
         .filter(Boolean);
       formData.append("agenda", JSON.stringify(agendaArray));
 
-      // Honeypot value (should be empty)
-      formData.append("company", company);
-
       formData.append("image", imageFile);
 
       const res = await fetch("/api/events", {
@@ -87,16 +72,8 @@ const CreateEventForm: React.FC = () => {
       });
 
       if (!res.ok) {
-        let message = 'Failed to create event';
-        try {
-          const data = await res.json();
-          message = data?.message || message;
-        } catch {}
-        if (res.status === 429) {
-          setError(message);
-          return;
-        }
-        throw new Error(message);
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.message || "Failed to create event");
       }
 
       const data = await res.json();
@@ -117,19 +94,6 @@ const CreateEventForm: React.FC = () => {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4 max-w-2xl">
-      {/* Honeypot field to trap bots - keep hidden */}
-      <div className="hidden" aria-hidden="true">
-        <label htmlFor="company">Company</label>
-        <input
-          id="company"
-          name="company"
-          type="text"
-          autoComplete="off"
-          tabIndex={-1}
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
-        />
-      </div>
       <div className="grid grid-cols-1 gap-4">
         <label className="flex flex-col gap-1">
           <span className="font-medium">Title</span>

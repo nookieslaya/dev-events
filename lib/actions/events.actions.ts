@@ -1,3 +1,4 @@
+'use server';
 
 import Event from '@/database/event.model';
 import connectDB from "@/lib/mongodb";
