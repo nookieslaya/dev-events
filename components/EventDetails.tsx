@@ -5,8 +5,9 @@ import { getSimilarEventsBySlug } from "@/lib/actions/events.actions";
 import Image from "next/image";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
+import { getBaseUrl } from "@/lib/getBaseUrl";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = getBaseUrl();
 
 const EventDetailItem = ({ icon, alt, label }: { icon: string; alt: string; label: string; }) => (
     <div className="flex-row-gap-2 items-center">

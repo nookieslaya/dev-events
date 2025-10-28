@@ -1,7 +1,10 @@
 export function getBaseUrl() {
   // Prefer explicitly provided public base URL
-  const explicit = process.env.NEXT_PUBLIC_BASE_URL?.trim();
-  if (explicit) return explicit.replace(/\/$/, "");
+  const explicitRaw = process.env.NEXT_PUBLIC_BASE_URL?.trim();
+  if (explicitRaw) {
+    const explicit = explicitRaw.startsWith("http") ? explicitRaw : `https://${explicitRaw}`;
+    return explicit.replace(/\/$/, "");
+  }
 
   // On Vercel, VERCEL_URL is like "my-app.vercel.app" (no protocol)
   const vercel = process.env.VERCEL_URL?.trim();
