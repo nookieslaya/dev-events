@@ -130,6 +130,13 @@
     ul {
         @apply list-disc list-inside;
     }
+
+    /* Lighter placeholder color across the app */
+    input::placeholder,
+    textarea::placeholder {
+        color: var(--color-light-200);
+        opacity: 0.85; /* slightly lighter/softer */
+    }
 }
 
 @layer components {
@@ -249,6 +256,24 @@
 
     .pill {
         @apply bg-dark-100 text-light-100 text-xs rounded-[6px] px-5 py-2;
+    }
+
+    /* Global form control styles */
+    .input {
+        @apply bg-dark-200 text-light-100 rounded-[6px] px-4 py-2.5 border border-dark-200 placeholder:text-light-200;
+    }
+    select.input {
+        @apply appearance-none bg-[right_0.75rem_center] bg-no-repeat;
+    }
+    .textarea,
+    textarea.textarea {
+        @apply bg-dark-200 text-light-100 rounded-[6px] px-4 py-2.5 border border-dark-200;
+    }
+    .input:focus,
+    .textarea:focus,
+    textarea.textarea:focus,
+    select.input:focus {
+        @apply outline-none ring-2 ring-primary/30 border-primary/60;
     }
 
     #book-event {
