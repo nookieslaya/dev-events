@@ -1,9 +1,14 @@
-import posthog from "posthog-js"
+import posthog from "posthog-js";
 
-posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-  api_host: "/ingest",
-  ui_host: "https://eu.posthog.com",
-  defaults: '2025-05-24',
-  capture_exceptions: true, // This enables capturing exceptions using Error Tracking, set to false if you don't want this
-  debug: process.env.NODE_ENV === "development",
-});
+const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+const apiHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com";
+const uiHost = process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || "https://eu.posthog.com";
+
+if (typeof window !== "undefined" && key) {
+  posthog.init(key, {
+    api_host: apiHost,
+    ui_host: uiHost,
+    capture_exceptions: true, // Enables capturing exceptions using Error Tracking
+    debug: process.env.NODE_ENV === "development",
+  });
+}
