@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { notFound } from "next/navigation";
 import { IEvent } from "@/database";
 import { getSimilarEventsBySlug } from "@/lib/actions/events.actions";
@@ -33,6 +33,21 @@ const EventTags = ({ tags }: { tags: string[] }) => (
         ))}
     </div>
 )
+
+// Isolate similar events fetching inside its own async component wrapped by Suspense
+const SimilarEvents = async ({ slug }: { slug: string }) => {
+    const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
+    if (!similarEvents || similarEvents.length === 0) {
+        return null;
+    }
+    return (
+        <div className="events">
+            {similarEvents.map((similarEvent: IEvent) => (
+                <EventCard key={similarEvent.title} {...similarEvent} />
+            ))}
+        </div>
+    );
+};
 
 const EventDetails = async ({ slug }: { slug: string }) => {
     // Avoid aggressive caching during development; rely on ISR from callers if needed
@@ -80,8 +95,6 @@ const EventDetails = async ({ slug }: { slug: string }) => {
     if (!description) return notFound();
 
     const bookings = 10;
-
-    const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
 
     return (
         <section id="event">
@@ -139,11 +152,10 @@ const EventDetails = async ({ slug }: { slug: string }) => {
 
             <div className="flex w-full flex-col gap-4 pt-20">
                 <h2>Similar Events</h2>
-                <div className="events">
-                    {similarEvents.length > 0 && similarEvents.map((similarEvent: IEvent) => (
-                        <EventCard key={similarEvent.title} {...similarEvent} />
-                    ))}
-                </div>
+                <Suspense fallback={<div className="opacity-70">Loading similar events...</div>}>
+                    {/* This isolates the uncached DB access inside a Suspense boundary */}
+                    <SimilarEvents slug={slug} />
+                </Suspense>
             </div>
         </section>
     )
