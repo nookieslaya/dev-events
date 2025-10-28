@@ -1,10 +1,13 @@
 import EventCard from "@/components/EventCard";
 import { IEvent } from "@/database";
+import { cacheLife } from "next/cache";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const EventsPage = async () => {
-  const response = await fetch(`${BASE_URL ? BASE_URL : ''}/api/events`, { next: { revalidate: 60 } });
+  'use cache';
+  cacheLife('minutes');
+  const response = await fetch(`${BASE_URL ? BASE_URL : ''}/api/events`);
   const { events } = await response.json();
 
   return (
