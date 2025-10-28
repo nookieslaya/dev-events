@@ -9,7 +9,18 @@ const EventsPage = async () => {
   'use cache';
   cacheLife('minutes');
   const response = await fetch(`${BASE_URL}/api/events`);
-  const { events } = await response.json();
+  let events: IEvent[] = [];
+  try {
+    if (response.ok) {
+      const ct = response.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const data = await response.json();
+        events = Array.isArray((data as any)?.events) ? (data as any).events : [];
+      }
+    }
+  } catch (err) {
+    // Ignore JSON parse/network errors during prerender; fall back to empty list
+  }
 
   return (
     <section className="space-y-7">
